@@ -34,3 +34,27 @@ allprojects {
         kotlinOptions.jvmTarget = "1.8"
     }
 }
+
+project(':building-graph') {
+    dependencies {
+        implementation project(':model')
+    }
+}
+
+project(':creating-copies') {
+    dependencies {
+        implementation project(':model')
+    }
+}
+
+project(':establishing-connections') {
+    dependencies {
+        implementation project(':model')
+    }
+}
+
+project(':facade') {
+    dependencies {
+        implementation project(':building-graph'), project(':creating-copies'), project(':establishing-connections')
+    }
+}
