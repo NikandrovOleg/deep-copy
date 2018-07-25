@@ -1,7 +1,10 @@
 package graphParts
 
-interface Vertex<T> {
+import kotlin.reflect.KClass
+
+interface Vertex<T : Any> {
     val color: Color
-    val properties: List<VertexProperty<Any>>
-    val copy: T
+    val properties: List<VertexProperty<*>>
+    val copy: T?
+    val kClass: KClass<T>
 }

@@ -1,8 +1,8 @@
 package graphParts
 
 interface Graph {
-    val Vertexes: List<Vertex<Any>>
+    val Vertexes: List<Vertex<*>>
 
-    fun getParents(vertex: Vertex<Any>): List<Vertex<Any>>
-    fun getChilds(vertex: Vertex<Any>): List<Vertex<Any>>
+    fun getParents(vertex: Vertex<Any>): List<Vertex<*>>
+    fun getChilds(vertex: Vertex<Any>): List<Vertex<*>>
 }
