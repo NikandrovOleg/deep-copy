@@ -35,7 +35,7 @@ allprojects {
     }
 }
 
-project(':building-graphParts') {
+project(':building-graph') {
     dependencies {
         implementation project(':model')
     }
@@ -55,6 +55,6 @@ project(':establishing-connections') {
 
 project(':facade') {
     dependencies {
-        implementation project(':building-graphParts'), project(':creating-copies'), project(':establishing-connections')
+        implementation project(':building-graph'), project(':creating-copies'), project(':establishing-connections')
     }
 }
