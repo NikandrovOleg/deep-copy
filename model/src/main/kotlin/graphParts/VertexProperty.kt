@@ -1,6 +1,6 @@
 package graphParts
 
-interface VertexProperty<T> {
+interface VertexProperty {
     val name: String
-    val value: T
+    val vertex: Vertex<*>
 }

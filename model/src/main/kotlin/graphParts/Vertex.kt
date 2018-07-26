@@ -4,7 +4,7 @@ import kotlin.reflect.KClass
 
 interface Vertex<T : Any> {
     val color: Color
-    val properties: List<VertexProperty<*>>
+    val properties: List<VertexProperty>
     val copy: T?
     val kClass: KClass<T>
 }
