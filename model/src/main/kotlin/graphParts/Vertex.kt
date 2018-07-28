@@ -3,8 +3,8 @@ package graphParts
 import kotlin.reflect.KClass
 
 interface Vertex<T : Any> {
-    val color: Color
+    val kClass: KClass<out T>
+    var color: Color
     val properties: List<VertexProperty>
-    val copy: T?
-    val kClass: KClass<T>
+    var copy: T?
 }
