@@ -13,7 +13,7 @@ object GraphBuilderImpl: GraphBuilder {
             if (vertexes.any { it.original === currentObj }) {
                 return vertexes.first { it.original === currentObj }
             } else {
-                if (currentObj !is String) {
+                if (currentObj::class !in leavesClasses) {
                     val vertex = VertexImpl(currentObj::class, currentObj,
                             properties = currentObj::class.memberProperties.map {
                                 val javaProp = currentObj::class.java.getDeclaredField(it.name)
@@ -33,3 +33,6 @@ object GraphBuilderImpl: GraphBuilder {
         return GraphImpl(vertexes)
     }
 }
+
+val leavesClasses = listOf(String::class, Double::class, Float::class, Long::class, Int::class, Short::class,
+        Byte::class, Char::class, Boolean::class)
