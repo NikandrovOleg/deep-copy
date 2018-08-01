@@ -15,10 +15,16 @@ object GraphBuilderImpl: GraphBuilder {
             } else {
                 if (currentObj::class !in leavesClasses) {
                     val vertex = VertexImpl(currentObj::class, currentObj,
-                            properties = currentObj::class.memberProperties.map {
-                                val javaProp = currentObj::class.java.getDeclaredField(it.name)
-                                javaProp.isAccessible = true
-                                VertexPropertyImpl(it.name, dfsVisit(javaProp.get(currentObj)))
+                            properties = currentObj::class.memberProperties
+                                    .filter {
+                                        val javaProp = currentObj::class.java.getDeclaredField(it.name)
+                                        javaProp.isAccessible = true
+                                        javaProp.get(currentObj) != null
+                                    }
+                                    .map {
+                                        val javaProp = currentObj::class.java.getDeclaredField(it.name)
+                                        javaProp.isAccessible = true
+                                        VertexPropertyImpl(it.name, dfsVisit(javaProp.get(currentObj)))
                             })
                     vertexes.add(vertex)
                     return vertex

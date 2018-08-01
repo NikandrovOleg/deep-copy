@@ -1,3 +1,4 @@
+import data.ComplexDataClass
 import data.PrimitiveDataClass
 import data.PrimitiveDataWithManyFieldsClass
 import graphParts.Graph
@@ -33,7 +34,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfPrimitiveWithManyFieldsClass() {
+    fun returnGraphOfPrimitiveDataWithManyFieldsClass() {
         val graph = GraphBuilderImpl.buildGraph(PrimitiveDataWithManyFieldsClass())
         assertThat(graph.vertexes.size, `is`(10))
         assertThat(graph.vertexes.map { it.kClass }, hasItems(
@@ -50,5 +51,18 @@ class GraphBuilderTest {
         ))
         assertThat(graph.vertexes.first { it.kClass == PrimitiveDataWithManyFieldsClass::class }.properties.size, `is`(9))
         assertThat(graph.vertexes.filter { it.kClass != PrimitiveDataWithManyFieldsClass::class }.all { it.copy != null }, equalTo(true))
+    }
+
+    @Test
+    fun returnGraphOfComplexDataClassWithNullField() {
+        val graph = GraphBuilderImpl.buildGraph(ComplexDataClass(ComplexDataClass()))
+        assertThat(graph.vertexes.size, `is`(7))
+        assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.size, `is`(2))
+        assertThat(graph.vertexes.filter { it.kClass == PrimitiveDataClass::class }.size, `is`(2))
+        assertThat(graph.vertexes.filter { it.kClass == String::class }.size, `is`(3))
+        assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.flatMap { it.properties }.
+                map { it.vertex }.count { it.kClass == ComplexDataClass::class }, `is`(1))
+        assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.flatMap { it.properties }.
+                map { it.vertex }.count { it.kClass == PrimitiveDataClass::class }, `is`(2))
     }
 }
