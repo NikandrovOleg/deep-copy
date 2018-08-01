@@ -1,6 +1,7 @@
 import data.ComplexDataClass
 import data.PrimitiveDataClass
 import data.PrimitiveDataWithManyFieldsClass
+import data.RecursiveDataClass
 import graphParts.Graph
 import org.junit.Test
 import org.hamcrest.CoreMatchers.*
@@ -64,5 +65,14 @@ class GraphBuilderTest {
                 map { it.vertex }.count { it.kClass == ComplexDataClass::class }, `is`(1))
         assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.flatMap { it.properties }.
                 map { it.vertex }.count { it.kClass == PrimitiveDataClass::class }, `is`(2))
+    }
+
+    @Test
+    fun returnGraphOfRecursiveObject() {
+        val obj = RecursiveDataClass()
+        obj.obj = obj
+        val graph = GraphBuilderImpl.buildGraph(obj)
+        assertThat(graph.vertexes.size, `is`(1))
+        assertThat(graph.vertexes.all { it.kClass == RecursiveDataClass::class }, equalTo(true))
     }
 }

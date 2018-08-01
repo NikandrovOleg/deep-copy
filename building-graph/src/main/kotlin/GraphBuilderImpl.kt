@@ -13,9 +13,10 @@ object GraphBuilderImpl: GraphBuilder {
             if (vertexes.any { it.original === currentObj }) {
                 return vertexes.first { it.original === currentObj }
             } else {
+                val vertex: VertexImpl<Any> = VertexImpl(currentObj::class, currentObj)
+                vertexes.add(vertex)
                 if (currentObj::class !in leavesClasses) {
-                    val vertex = VertexImpl(currentObj::class, currentObj,
-                            properties = currentObj::class.memberProperties
+                    vertex.properties.addAll(currentObj::class.memberProperties
                                     .filter {
                                         val javaProp = currentObj::class.java.getDeclaredField(it.name)
                                         javaProp.isAccessible = true
@@ -26,11 +27,9 @@ object GraphBuilderImpl: GraphBuilder {
                                         javaProp.isAccessible = true
                                         VertexPropertyImpl(it.name, dfsVisit(javaProp.get(currentObj)))
                             })
-                    vertexes.add(vertex)
-                    return vertex
+                } else {
+                    vertex.copy = currentObj
                 }
-                val vertex = VertexImpl(currentObj::class, currentObj, currentObj)
-                vertexes.add(vertex)
                 return vertex
             }
         }
