@@ -75,4 +75,15 @@ class GraphBuilderTest {
         assertThat(graph.vertexes.size, `is`(1))
         assertThat(graph.vertexes.all { it.kClass == RecursiveDataClass::class }, equalTo(true))
     }
+
+    @Test
+    fun returnCyclicGraph() {
+        val obj1 = RecursiveDataClass()
+        val obj2 = RecursiveDataClass(obj1)
+        val obj3 = RecursiveDataClass(obj2)
+        obj1.obj = obj3
+        val graph = GraphBuilderImpl.buildGraph(obj1)
+        assertThat(graph.vertexes.size, `is`(3))
+        assertThat(graph.vertexes.all { it.properties.size == 1 }, equalTo(true))
+    }
 }
