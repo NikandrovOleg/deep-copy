@@ -1,11 +1,10 @@
-import data.ComplexDataClass
-import data.PrimitiveDataClass
-import data.PrimitiveDataWithManyFieldsClass
-import data.RecursiveDataClass
+import data.*
 import graphParts.Graph
+import modelImpl.VertexImpl
 import org.junit.Test
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
+import kotlin.reflect.full.memberProperties
 
 class GraphBuilderTest {
 
@@ -55,14 +54,22 @@ class GraphBuilderTest {
     }
 
     @Test
+    fun returnGraphOfPrimitiveDataClassWithNullField() {
+        val graph = GraphBuilderImpl.buildGraph(PrimitiveDataClass(null, null))
+        assertThat(graph.vertexes.size, `is`(2))
+        assertThat(graph.vertexes.count { it.kClass == PrimitiveDataClass::class }, `is`(1))
+        assertThat(graph.vertexes.count { it.kClass == String::class && it.copy == null }, `is`(1))
+    }
+
+    @Test
     fun returnGraphOfComplexDataClassWithNullField() {
         val graph = GraphBuilderImpl.buildGraph(ComplexDataClass(ComplexDataClass()))
-        assertThat(graph.vertexes.size, `is`(7))
-        assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.size, `is`(2))
+        assertThat(graph.vertexes.size, `is`(8))
+        assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.size, `is`(3))
         assertThat(graph.vertexes.filter { it.kClass == PrimitiveDataClass::class }.size, `is`(2))
         assertThat(graph.vertexes.filter { it.kClass == String::class }.size, `is`(3))
         assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.flatMap { it.properties }.
-                map { it.vertex }.count { it.kClass == ComplexDataClass::class }, `is`(1))
+                map { it.vertex }.count { it.kClass == ComplexDataClass::class }, `is`(2))
         assertThat(graph.vertexes.filter { it.kClass == ComplexDataClass::class }.flatMap { it.properties }.
                 map { it.vertex }.count { it.kClass == PrimitiveDataClass::class }, `is`(2))
     }
