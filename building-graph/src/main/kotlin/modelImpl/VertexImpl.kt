@@ -10,4 +10,5 @@ data class VertexImpl<T : Any>(
         val original: T? = null,
         override var copy: T? = null,
         override val properties: MutableList<VertexProperty<*>> = mutableListOf(),
-        override var color: Color = Color.WHITE) : Vertex<T>
+        override var color: Color = Color.WHITE,
+        override val isNull: Boolean = false) : Vertex<T>

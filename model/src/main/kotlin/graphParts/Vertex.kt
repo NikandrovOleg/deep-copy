@@ -7,4 +7,5 @@ interface Vertex<T : Any> {
     var color: Color
     val properties: MutableList<VertexProperty<*>>
     var copy: T?
+    val isNull: Boolean
 }

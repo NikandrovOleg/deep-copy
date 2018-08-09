@@ -5,6 +5,7 @@ import org.junit.Test
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.jvmErasure
 
 class GraphBuilderTest {
 

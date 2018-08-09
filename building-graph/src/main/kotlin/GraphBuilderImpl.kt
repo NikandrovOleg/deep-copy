@@ -18,16 +18,21 @@ object GraphBuilderImpl: GraphBuilder {
     }
 
     private fun dfsVisit(currentObj: Any?, kclass: KClass<*>, vertexes: MutableList<VertexImpl<*>>): Vertex<*> {
-        return if (vertexes.any { it.original === currentObj }) {
-            vertexes.first { it.original === currentObj }
-        } else {
-            val vertex = VertexImpl(kclass, currentObj)
-            vertexes.add(vertex)
-            if (currentObj != null) {
+        return when {
+            vertexes.any { it.original === currentObj && it.kClass == kclass }
+                -> vertexes.first { it.original === currentObj }
+            currentObj == null -> {
+                val vertex = VertexImpl(kclass, isNull = true)
+                vertexes.add(vertex)
+                vertex
+            }
+            else -> {
+                val vertex = VertexImpl(kclass, currentObj)
+                vertexes.add(vertex)
                 customizeFunctions.getOrDefault(kclass, vertexOfComplexClass)
                         .invoke(currentObj, vertex, vertexes)
+                vertex
             }
-            vertex
         }
     }
 
