@@ -2,53 +2,59 @@ import graphParts.Graph
 import graphParts.Vertex
 import modelImpl.GraphImpl
 import modelImpl.VertexImpl
-import modelImpl.VertexPropertyImpl
+import modelImpl.vertices.ComplexVertexImpl
+import modelImpl.vertices.NullVertexImpl
+import modelImpl.vertices.PrimitiveVertexImpl
 import kotlin.reflect.KClass
 
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
 object GraphBuilderImpl: GraphBuilder {
+    private val vertices = mutableListOf<VertexImpl<*, *>>()
+
     override fun buildGraph(obj: Any?): Graph {
-        val vertexes = mutableListOf<VertexImpl<*>>()
         if (obj != null) {
-            dfsVisit(obj, obj::class, vertexes)
+            dfsVisit(obj, obj::class)
         }
-        return GraphImpl(vertexes)
+        return GraphImpl(vertices)
     }
 
-    private fun dfsVisit(currentObj: Any?, kclass: KClass<*>, vertexes: MutableList<VertexImpl<*>>): Vertex<*> {
+    private fun dfsVisit(currentObj: Any?, kClass: KClass<*>): Vertex<*, *> {
         return when {
-            vertexes.any { it.original === currentObj && it.kClass == kclass }
-                -> vertexes.first { it.original === currentObj }
+            vertices.any { it.original === currentObj && it.kClass == kClass }
+                -> vertices.first { it.original === currentObj }
             currentObj == null -> {
-                val vertex = VertexImpl(kclass, isNull = true)
-                vertexes.add(vertex)
+                val vertex = NullVertexImpl(kClass)
+                vertices.add(vertex)
                 vertex
             }
             else -> {
-                val vertex = VertexImpl(kclass, currentObj)
-                vertexes.add(vertex)
-                customizeFunctions.getOrDefault(kclass, vertexOfComplexClass)
-                        .invoke(currentObj, vertex, vertexes)
+                val vertex = creationVertexFunctions.getOrDefault(kClass, vertexOfComplexClass).
+                        invoke(currentObj, kClass)
                 vertex
             }
         }
     }
 
-    private val vertexOfComplexClass = { currentObj: Any, vertex: Vertex<*>, vertexes: MutableList<VertexImpl<*>> ->
-        vertex.properties.addAll(currentObj::class.memberProperties
-                .map {
-                    val javaProp = currentObj::class.java.getDeclaredField(it.name)
-                    javaProp.isAccessible = true
-                    VertexPropertyImpl(it.name, dfsVisit(javaProp.get(currentObj), it.returnType.jvmErasure, vertexes))
-                })
+    private val vertexOfComplexClass = { currentObj: Any, kClass: KClass<*> ->
+        val vertex = ComplexVertexImpl(kClass, currentObj)
+        vertices.add(vertex)
+        vertex.properties.putAll(vertex.kClass.memberProperties.associate {
+            val javaProp = vertex.kClass.java.getDeclaredField(it.name)
+            javaProp.isAccessible = true
+            Pair(it.name, dfsVisit(javaProp.get(vertex.original), it.returnType.jvmErasure))
+        })
+        vertex
     }
 
-    private val vertexOfPrimitiveType = { currentObj: Any, vertex: Vertex<Any>, _: MutableList<VertexImpl<*>>
-        -> vertex.copy = currentObj }
+    private val vertexOfPrimitiveType = { currentObj: Any, kClass: KClass<*> ->
+        val vertex = PrimitiveVertexImpl(kClass, currentObj, currentObj)
+        vertices.add(vertex)
+        vertex
+    }
 
-    private val customizeFunctions= hashMapOf(
+    private val creationVertexFunctions=hashMapOf(
             String::class to vertexOfPrimitiveType,
             Double::class to vertexOfPrimitiveType,
             Float::class to vertexOfPrimitiveType,

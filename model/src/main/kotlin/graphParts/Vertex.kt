@@ -2,10 +2,9 @@ package graphParts
 
 import kotlin.reflect.KClass
 
-interface Vertex<T : Any> {
-    val kClass: KClass<out T>?
+interface Vertex<T : Any, V : Any> {
+    val kClass: KClass<out T>
     var color: Color
-    val properties: MutableList<VertexProperty<*>>
     var copy: T?
-    val isNull: Boolean
+    val properties: MutableMap<V, Vertex<*,*>>
 }
