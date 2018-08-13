@@ -11,4 +11,5 @@ data class PrimitiveVertexImpl<T: Any>(
         override val original: T,
         override var copy: T?,
         override var color: Color = Color.WHITE,
-        override val properties: MutableMap<Any, Vertex<*, *>> = mutableMapOf()) : PrimitiveVertex<T>, VertexImpl<T, Any>()
+        override val properties: MutableMap<Any, Vertex<*, *>> = mutableMapOf()
+) : PrimitiveVertex<T>, VertexImpl<T, Any>()

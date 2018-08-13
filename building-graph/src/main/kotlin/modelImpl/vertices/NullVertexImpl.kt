@@ -10,4 +10,5 @@ data class NullVertexImpl<T: Any> (
         override val kClass: KClass<out T>,
         override val original: T? = null,
         override var color: Color = Color.WHITE,
-        override val properties: MutableMap<Any, Vertex<*, *>> = mutableMapOf()) : NullVertex<T>, VertexImpl<T, Any>()
+        override val properties: MutableMap<Any, Vertex<*, *>> = mutableMapOf()
+) : NullVertex<T>, VertexImpl<T, Any>()

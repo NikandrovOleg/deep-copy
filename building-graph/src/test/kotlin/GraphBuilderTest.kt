@@ -99,6 +99,7 @@ class GraphBuilderTest {
         val graph = GraphBuilderImpl.buildGraph(arrayOf("string1", "string2", "string3", "string1"))
         assertThat(graph.vertices.size, `is`(4))
         assertThat(graph.vertices.count { it.kClass == Array<String>::class }, `is`(1))
+        assertThat(graph.vertices.first { it.kClass == Array<String>::class }.properties.values.size, `is`(4))
         assertThat(graph.vertices.count { it.kClass == String::class }, `is`(3))
     }
 
@@ -107,6 +108,7 @@ class GraphBuilderTest {
         val graph = GraphBuilderImpl.buildGraph(arrayOf('a', null, null, null, 'e'))
         assertThat(graph.vertices.size, `is`(4))
         assertThat(graph.vertices.count { it.kClass == Array<Char>::class }, `is`(1))
+        assertThat(graph.vertices.first { it.kClass == Array<Char>::class }.properties.values.size, `is`(5))
         assertThat(graph.vertices.count { it.kClass == Char::class }, `is`(3))
         assertThat(graph.vertices.count { it.kClass == Char::class && it is NullVertexImpl }, `is`(1))
     }
