@@ -6,6 +6,7 @@ import modelImpl.vertices.PrimitiveVertexImpl
 import org.junit.Test
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
+import kotlin.reflect.full.isSubclassOf
 
 class GraphBuilderTest {
 
@@ -104,12 +105,32 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfNullableChars() {
+    fun returnGraphOfListOfNullableChars() {
         val graph = GraphBuilderImpl.buildGraph(arrayOf('a', null, null, null, 'e'))
         assertThat(graph.vertices.size, `is`(4))
         assertThat(graph.vertices.count { it.kClass == Array<Char>::class }, `is`(1))
         assertThat(graph.vertices.first { it.kClass == Array<Char>::class }.properties.values.size, `is`(5))
         assertThat(graph.vertices.count { it.kClass == Char::class }, `is`(3))
         assertThat(graph.vertices.count { it.kClass == Char::class && it is NullVertexImpl }, `is`(1))
+    }
+
+    @Test
+    fun returnGraphOfListOfInts() {
+        val graph = GraphBuilderImpl.buildGraph(listOf(1, 2, 1, 2, 1, 2))
+        assertThat(graph.vertices.size, `is`(7))
+        assertThat(graph.vertices.count { it.kClass.isSubclassOf(List::class) }, `is`(1))
+        assertThat(graph.vertices.first { it.kClass.isSubclassOf(List::class) }.properties.values.size, `is`(6))
+        assertThat(graph.vertices.count { it.kClass == Int::class }, `is`(6))
+    }
+
+    @Test
+    fun returnGraphOfListOfNullableDouble() {
+        val graph = GraphBuilderImpl.buildGraph(listOf<Double?>(3.14, 5.67, null, null, 9.73))
+        assertThat(graph.vertices.size, `is`(5))
+        assertThat(graph.vertices.count { it.kClass.isSubclassOf(List::class) }, `is`(1))
+        assertThat(graph.vertices.first { it.kClass.isSubclassOf(List::class) }.properties.values.size, `is`(5))
+        println(graph.vertices.first { !it.kClass.isSubclassOf(List::class) && it.kClass != Double::class }.kClass)
+        assertThat(graph.vertices.count { it.kClass == Double::class }, `is`(3))
+        assertThat(graph.vertices.count { it.kClass == Any::class && it is NullVertexImpl }, `is`(1))
     }
 }

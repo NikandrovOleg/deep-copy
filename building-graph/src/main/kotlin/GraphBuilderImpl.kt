@@ -2,10 +2,7 @@ import graphParts.Graph
 import graphParts.Vertex
 import modelImpl.GraphImpl
 import modelImpl.VertexImpl
-import modelImpl.vertices.ArrayVertexImpl
-import modelImpl.vertices.ComplexVertexImpl
-import modelImpl.vertices.NullVertexImpl
-import modelImpl.vertices.PrimitiveVertexImpl
+import modelImpl.vertices.*
 import kotlin.reflect.KClass
 
 import kotlin.reflect.full.memberProperties
@@ -34,8 +31,12 @@ object GraphBuilderImpl: GraphBuilder {
                 val vertex = vertexOfArray(currentObj, vertices)
                 vertex
             }
+            currentObj is List<*> -> {
+                val vertex = vertexOfList(currentObj, vertices)
+                vertex
+            }
             else -> {
-                val vertex = creationVertexFunctions.getOrDefault(kClass, vertexOfComplexClass).
+                val vertex = creationVertexFunctions.getOrDefault(currentObj::class, vertexOfComplexClass).
                     invoke(currentObj, vertices)
                 vertex
             }
@@ -64,6 +65,13 @@ object GraphBuilderImpl: GraphBuilder {
         vertices.add(vertex)
         val arrayType = currentArray::class.java.componentType.kotlin
         for (i in currentArray.indices) { vertex.properties[i] = dfsVisit(currentArray[i], arrayType, vertices) }
+        vertex
+    }
+
+    private val vertexOfList = { currentArray: List<*>, vertices: MutableList<VertexImpl<*, *>> ->
+        val vertex = ListVertexImpl(currentArray::class, currentArray)
+        vertices.add(vertex)
+        for (i in currentArray.indices) { vertex.properties[i] = dfsVisit(currentArray[i], Any::class, vertices) }
         vertex
     }
 
