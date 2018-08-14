@@ -105,7 +105,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfListOfNullableChars() {
+    fun returnGraphOfArrayOfNullableChars() {
         val graph = GraphBuilderImpl.buildGraph(arrayOf('a', null, null, null, 'e'))
         assertThat(graph.vertices.size, `is`(4))
         assertThat(graph.vertices.count { it.kClass == Array<Char>::class }, `is`(1))
@@ -125,12 +125,30 @@ class GraphBuilderTest {
 
     @Test
     fun returnGraphOfListOfNullableDouble() {
-        val graph = GraphBuilderImpl.buildGraph(listOf<Double?>(3.14, 5.67, null, null, 9.73))
+        val graph = GraphBuilderImpl.buildGraph(listOf(3.14, 5.67, null, null, 9.73))
         assertThat(graph.vertices.size, `is`(5))
         assertThat(graph.vertices.count { it.kClass.isSubclassOf(List::class) }, `is`(1))
         assertThat(graph.vertices.first { it.kClass.isSubclassOf(List::class) }.properties.values.size, `is`(5))
-        println(graph.vertices.first { !it.kClass.isSubclassOf(List::class) && it.kClass != Double::class }.kClass)
         assertThat(graph.vertices.count { it.kClass == Double::class }, `is`(3))
+        assertThat(graph.vertices.count { it.kClass == Any::class && it is NullVertexImpl }, `is`(1))
+    }
+
+    @Test
+    fun returnGraphOfSetOfFloats() {
+        val graph = GraphBuilderImpl.buildGraph(setOf(7.87F, 9.32F, -8.41F))
+        assertThat(graph.vertices.size, `is`(4))
+        assertThat(graph.vertices.count { it.kClass.isSubclassOf(Set::class) }, `is`(1))
+        assertThat(graph.vertices.first { it.kClass.isSubclassOf(Set::class) }.properties.values.size, `is`(3))
+        assertThat(graph.vertices.count { it.kClass == Float::class }, `is`(3))
+    }
+
+    @Test
+    fun returnGraphOfSetOfNullableLongs() {
+        val graph = GraphBuilderImpl.buildGraph(setOf(4L, 893745L, null, 2L))
+        assertThat(graph.vertices.size, `is`(5))
+        assertThat(graph.vertices.count { it.kClass.isSubclassOf(Set::class) }, `is`(1))
+        assertThat(graph.vertices.first { it.kClass.isSubclassOf(Set::class) }.properties.values.size, `is`(4))
+        assertThat(graph.vertices.count { it.kClass == Long::class }, `is`(3))
         assertThat(graph.vertices.count { it.kClass == Any::class && it is NullVertexImpl }, `is`(1))
     }
 }

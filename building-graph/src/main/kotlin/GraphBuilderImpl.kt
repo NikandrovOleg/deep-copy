@@ -35,6 +35,10 @@ object GraphBuilderImpl: GraphBuilder {
                 val vertex = vertexOfList(currentObj, vertices)
                 vertex
             }
+            currentObj is Set<*> -> {
+                val vertex = vertexOfSet(currentObj, vertices)
+                vertex
+            }
             else -> {
                 val vertex = creationVertexFunctions.getOrDefault(currentObj::class, vertexOfComplexClass).
                     invoke(currentObj, vertices)
@@ -64,14 +68,27 @@ object GraphBuilderImpl: GraphBuilder {
         val vertex = ArrayVertexImpl(currentArray::class, currentArray)
         vertices.add(vertex)
         val arrayType = currentArray::class.java.componentType.kotlin
-        for (i in currentArray.indices) { vertex.properties[i] = dfsVisit(currentArray[i], arrayType, vertices) }
+        for (i in currentArray.indices) {
+            vertex.properties[i] = dfsVisit(currentArray[i], arrayType, vertices)
+        }
         vertex
     }
 
-    private val vertexOfList = { currentArray: List<*>, vertices: MutableList<VertexImpl<*, *>> ->
-        val vertex = ListVertexImpl(currentArray::class, currentArray)
+    private val vertexOfList = { currentList: List<*>, vertices: MutableList<VertexImpl<*, *>> ->
+        val vertex = ListVertexImpl(currentList::class, currentList)
         vertices.add(vertex)
-        for (i in currentArray.indices) { vertex.properties[i] = dfsVisit(currentArray[i], Any::class, vertices) }
+        for (i in currentList.indices) {
+            vertex.properties[i] = dfsVisit(currentList[i], Any::class, vertices)
+        }
+        vertex
+    }
+
+    private val vertexOfSet = { currentSet: Set<*>, vertices: MutableList<VertexImpl<*, *>> ->
+        val vertex = SetVertexImpl(currentSet::class, currentSet)
+        vertices.add(vertex)
+        for (i in currentSet.indices) {
+            vertex.properties[i] = dfsVisit(currentSet.elementAt(i), Any::class, vertices)
+        }
         vertex
     }
 
