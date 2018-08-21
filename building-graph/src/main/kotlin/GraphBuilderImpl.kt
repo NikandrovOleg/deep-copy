@@ -4,8 +4,11 @@ import modelImpl.GraphImpl
 import modelImpl.VertexImpl
 import modelImpl.vertices.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.isSubclassOf
 
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.jvmErasure
 
 object GraphBuilderImpl: GraphBuilder {
@@ -23,84 +26,98 @@ object GraphBuilderImpl: GraphBuilder {
             vertices.any { it.original === currentObj && it.kClass == kClass }
                 -> vertices.first { it.original === currentObj }
             currentObj == null -> {
-                val vertex = NullVertexImpl(kClass)
-                vertices.add(vertex)
-                vertex
+                NullVertexImpl(kClass).also { vertices.add(it) }
             }
             currentObj is Array<*> -> {
-                val vertex = vertexOfArray(currentObj, vertices)
-                vertex
-            }
-            currentObj is List<*> -> {
-                val vertex = vertexOfList(currentObj, vertices)
-                vertex
-            }
-            currentObj is Set<*> -> {
-                val vertex = vertexOfSet(currentObj, vertices)
-                vertex
+                vertexOfArray(currentObj, vertices)
             }
             else -> {
-                val vertex = creationVertexFunctions.getOrDefault(currentObj::class, vertexOfComplexClass).
-                    invoke(currentObj, vertices)
-                vertex
+                (creationVertexFunctions.filterKeys { currentObj::class.isSubclassOf(it) }.values.
+                    firstOrNull()?: vertexOfComplexClass).invoke(currentObj, vertices)
             }
         }
     }
 
     private val vertexOfComplexClass = { currentObj: Any, vertices: MutableList<VertexImpl<*, *>> ->
-        val vertex = ComplexVertexImpl(currentObj::class, currentObj)
-        vertices.add(vertex)
+        ComplexVertexImpl(currentObj::class, currentObj).also {
+            vertices.add(it)
+            configurePropertiesOfComplexClass(it, vertices)
+        }
+    }
+
+    private fun configurePropertiesOfComplexClass (vertex: ComplexVertexImpl<*>, vertices: MutableList<VertexImpl<*, *>>) {
         vertex.properties.putAll(vertex.kClass.memberProperties.associate {
-            val javaProp = vertex.kClass.java.getDeclaredField(it.name)
-            javaProp.isAccessible = true
-            Pair(it.name, dfsVisit(javaProp.get(vertex.original), it.returnType.jvmErasure, vertices))
+            Pair(it.name, dfsVisit(vertex.kClass.java.getDeclaredField(it.name).also { it.isAccessible = true }
+                .get(vertex.original), it.returnType.jvmErasure, vertices))
         })
-        vertex
     }
 
     private val vertexOfPrimitiveType = { currentObj: Any, vertices: MutableList<VertexImpl<*, *>> ->
-        val vertex = PrimitiveVertexImpl(currentObj::class, currentObj, currentObj)
-        vertices.add(vertex)
-        vertex
+        PrimitiveVertexImpl(currentObj::class, currentObj, currentObj).also { vertices.add(it) }
     }
 
     private val vertexOfArray = { currentArray: Array<*>, vertices: MutableList<VertexImpl<*, *>> ->
-        val vertex = ArrayVertexImpl(currentArray::class, currentArray)
-        vertices.add(vertex)
-        val arrayType = currentArray::class.java.componentType.kotlin
-        for (i in currentArray.indices) {
-            vertex.properties[i] = dfsVisit(currentArray[i], arrayType, vertices)
+        ArrayVertexImpl(currentArray::class, currentArray).also {
+            vertices.add(it)
+            val arrayType = currentArray::class.java.componentType.kotlin
+            for (i in currentArray.indices) {
+                it.properties[i] = dfsVisit(currentArray[i], arrayType, vertices)
+            }
         }
-        vertex
     }
 
-    private val vertexOfList = { currentList: List<*>, vertices: MutableList<VertexImpl<*, *>> ->
-        val vertex = ListVertexImpl(currentList::class, currentList)
-        vertices.add(vertex)
-        for (i in currentList.indices) {
-            vertex.properties[i] = dfsVisit(currentList[i], Any::class, vertices)
+    private val vertexOfList = { currentObj: Any, vertices: MutableList<VertexImpl<*, *>> ->
+        val currentList = currentObj as List<*>
+        ListVertexImpl(currentList::class, currentList).also {
+            vertices.add(it)
+            for (i in currentList.indices) {
+                it.properties[i] = dfsVisit(currentList[i], Any::class, vertices)
+            }
         }
-        vertex
     }
 
-    private val vertexOfSet = { currentSet: Set<*>, vertices: MutableList<VertexImpl<*, *>> ->
-        val vertex = SetVertexImpl(currentSet::class, currentSet)
-        vertices.add(vertex)
-        for (i in currentSet.indices) {
-            vertex.properties[i] = dfsVisit(currentSet.elementAt(i), Any::class, vertices)
+    private val vertexOfSet = { currentObject: Any, vertices: MutableList<VertexImpl<*, *>> ->
+        val currentSet = currentObject as Set<*>
+        SetVertexImpl(currentSet::class, currentSet).also {
+            vertices.add(it)
+            for (i in currentSet.indices) {
+                it.properties[i] = dfsVisit(currentSet.elementAt(i), Any::class, vertices)
+            }
         }
-        vertex
+    }
+
+    private val vertexOfMap = { currentObj: Any, vertices: MutableList<VertexImpl<*, *>> ->
+        val currentMap = currentObj as Map<*, *>
+        MapVertexImpl(currentMap::class, currentMap).also {
+            vertices.add(it)
+            for (i in currentMap.entries.indices) {
+                it.properties[i] = dfsVisit(currentMap.entries.elementAt(i), Any::class, vertices)
+            }
+        }
+    }
+
+    private val vertexOfEntry = { currentObj: Any, vertices: MutableList<VertexImpl<*, *>> ->
+        val currentEntry = currentObj as Map.Entry<*, *>
+        EntryVertexImpl(currentEntry::class, currentEntry).also {
+            vertices.add(it)
+            it.properties["key"] = dfsVisit(currentEntry.key, Any::class, vertices)
+            it.properties["value"] = dfsVisit(currentEntry.value, Any::class, vertices)
+        }
     }
 
     private val creationVertexFunctions = hashMapOf(
-            String::class to vertexOfPrimitiveType,
-            Double::class to vertexOfPrimitiveType,
-            Float::class to vertexOfPrimitiveType,
-            Long::class to vertexOfPrimitiveType,
-            Int::class to vertexOfPrimitiveType,
-            Short::class to vertexOfPrimitiveType,
-            Byte::class to vertexOfPrimitiveType,
-            Char::class to vertexOfPrimitiveType,
-            Boolean::class to vertexOfPrimitiveType
+        String::class to vertexOfPrimitiveType,
+        Double::class to vertexOfPrimitiveType,
+        Float::class to vertexOfPrimitiveType,
+        Long::class to vertexOfPrimitiveType,
+        Int::class to vertexOfPrimitiveType,
+        Short::class to vertexOfPrimitiveType,
+        Byte::class to vertexOfPrimitiveType,
+        Char::class to vertexOfPrimitiveType,
+        Boolean::class to vertexOfPrimitiveType,
+        List::class to vertexOfList,
+        Set::class to vertexOfSet,
+        Map::class to vertexOfMap,
+        Map.Entry::class to vertexOfEntry
     )
 }

@@ -151,4 +151,19 @@ class GraphBuilderTest {
         assertThat(graph.vertices.count { it.kClass == Long::class }, `is`(3))
         assertThat(graph.vertices.count { it.kClass == Any::class && it is NullVertexImpl }, `is`(1))
     }
+
+    @Test
+    fun returnGraphOfMap() {
+        val graph = GraphBuilderImpl.buildGraph(mapOf("a" to 1, "b" to 2, "c" to 3))
+        assertThat(graph.vertices.size, `is`(10))
+        assertThat(graph.vertices.count { it.kClass.isSubclassOf(Map::class) }, `is`(1))
+        assertThat(graph.vertices.count { it.kClass.isSubclassOf(Map.Entry::class) }, `is`(3))
+        assertThat(graph.vertices.count { it.kClass == String::class }, `is`(3))
+        assertThat(graph.vertices.count { it.kClass == Int::class }, `is`(3))
+        assertThat(graph.vertices.first { it.kClass.isSubclassOf(Map::class) }.properties.size, `is`(3))
+        assertThat(graph.vertices.first { it.kClass.isSubclassOf(Map::class) }.properties.values.
+            all { it.kClass.isSubclassOf(Map.Entry::class) }, `is`(true))
+        assertThat(graph.vertices.filter { it.kClass == Map.Entry::class }.flatMap { it.properties.values }.
+            all { it.kClass == String::class || it.kClass == Int::class }, `is`(true))
+    }
 }
