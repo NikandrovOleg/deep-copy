@@ -66,22 +66,12 @@ object GraphBuilderImpl: GraphBuilder {
         }
     }
 
-    private val vertexOfList = { currentObj: Any, vertices: MutableList<VertexImpl<*, *>> ->
-        val currentList = currentObj as List<*>
-        ListVertexImpl(currentList::class, currentList).also {
+    private val vertexOfCollection = { currentObject: Any, vertices: MutableList<VertexImpl<*, *>> ->
+        val currentCollection = currentObject as Collection<*>
+        CollectionVertexImpl(currentCollection::class, currentCollection).also {
             vertices.add(it)
-            for (i in currentList.indices) {
-                it.properties[i] = dfsVisit(currentList[i], Any::class, vertices)
-            }
-        }
-    }
-
-    private val vertexOfSet = { currentObject: Any, vertices: MutableList<VertexImpl<*, *>> ->
-        val currentSet = currentObject as Set<*>
-        SetVertexImpl(currentSet::class, currentSet).also {
-            vertices.add(it)
-            for (i in currentSet.indices) {
-                it.properties[i] = dfsVisit(currentSet.elementAt(i), Any::class, vertices)
+            for (i in currentCollection.indices) {
+                it.properties[i] = dfsVisit(currentCollection.elementAt(i), Any::class, vertices)
             }
         }
     }
@@ -107,16 +97,10 @@ object GraphBuilderImpl: GraphBuilder {
 
     private val creationVertexFunctions = hashMapOf(
         String::class to vertexOfPrimitiveType,
-        Double::class to vertexOfPrimitiveType,
-        Float::class to vertexOfPrimitiveType,
-        Long::class to vertexOfPrimitiveType,
-        Int::class to vertexOfPrimitiveType,
-        Short::class to vertexOfPrimitiveType,
-        Byte::class to vertexOfPrimitiveType,
+        Number::class to vertexOfPrimitiveType,
         Char::class to vertexOfPrimitiveType,
         Boolean::class to vertexOfPrimitiveType,
-        List::class to vertexOfList,
-        Set::class to vertexOfSet,
+        Collection::class to vertexOfCollection,
         Map::class to vertexOfMap,
         Map.Entry::class to vertexOfEntry
     )
