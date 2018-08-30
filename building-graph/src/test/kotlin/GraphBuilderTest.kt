@@ -20,7 +20,7 @@ class GraphBuilderTest {
         val str = "testString"
         val graph = GraphBuilderImpl.buildGraph(str)
         assertThat(graph.vertices.size, `is`(1))
-        assertThat(graph.vertices[0].copy as String, equalTo(str))
+        assertThat(graph.vertices[0].replica as String, equalTo(str))
     }
 
     @Test
@@ -28,9 +28,9 @@ class GraphBuilderTest {
         val graph = GraphBuilderImpl.buildGraph(PrimitiveDataClass("str1", "str2"))
         assertThat(graph.vertices.size, `is`(3))
         assertThat(graph.vertices.map { it.kClass }, hasItems(String::class, PrimitiveDataClass::class))
-        assertThat(graph.vertices.any { it.copy == "str1" }, equalTo(true))
-        assertThat(graph.vertices.any { it.copy == "str2" }, equalTo(true))
-        assertThat(graph.vertices.first { it.kClass == PrimitiveDataClass::class }.properties.map { it.value.copy as String },
+        assertThat(graph.vertices.any { it.replica == "str1" }, equalTo(true))
+        assertThat(graph.vertices.any { it.replica == "str2" }, equalTo(true))
+        assertThat(graph.vertices.first { it.kClass == PrimitiveDataClass::class }.properties.map { it.value.replica as String },
                 hasItems("str1", "str2"))
         assertThat(graph.vertices.filter { it.kClass == String::class }.all { it.properties.isEmpty() }, equalTo(true))
     }
@@ -52,7 +52,7 @@ class GraphBuilderTest {
                 Boolean::class
         ))
         assertThat(graph.vertices.first { it.kClass == PrimitiveDataWithManyFieldsClass::class }.properties.size, `is`(9))
-        assertThat(graph.vertices.filter { it.kClass != PrimitiveDataWithManyFieldsClass::class }.all { it.copy != null }, equalTo(true))
+        assertThat(graph.vertices.filter { it.kClass != PrimitiveDataWithManyFieldsClass::class }.all { it.replica != null }, equalTo(true))
     }
 
     @Test
@@ -60,7 +60,7 @@ class GraphBuilderTest {
         val graph = GraphBuilderImpl.buildGraph(PrimitiveDataClass(null, null))
         assertThat(graph.vertices.size, `is`(2))
         assertThat(graph.vertices.count { it.kClass == PrimitiveDataClass::class }, `is`(1))
-        assertThat(graph.vertices.count { it.kClass == String::class && it.copy == null }, `is`(1))
+        assertThat(graph.vertices.count { it.kClass == String::class && it.replica == null }, `is`(1))
     }
 
     @Test
