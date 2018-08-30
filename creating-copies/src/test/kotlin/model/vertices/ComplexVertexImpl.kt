@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 
 data class ComplexVertexImpl<T: Any>(
     override val kClass: KClass<out T>,
-    override var copy: T? = null,
+    override var replica: T? = null,
     override var color: Color = Color.WHITE,
     override val properties: MutableMap<String, Vertex<*, *>> = mutableMapOf()
 ) : ComplexVertex<T>

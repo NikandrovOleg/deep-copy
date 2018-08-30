@@ -10,6 +10,6 @@ data class ArrayVertexImpl(
     override val kClass: KClass<out Array<*>>,
     override val original: Array<*>?,
     override var color: Color = Color.WHITE,
-    override var copy: Array<*>? = null,
+    override var replica: Array<*>? = null,
     override val properties: MutableMap<Int, Vertex<*, *>> = mutableMapOf()
 ) : ArrayVertex, VertexImpl<Array<*>, Int>()

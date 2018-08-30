@@ -1,4 +1,4 @@
 data class SimpleDataClass(
-    val someString : String,
-    val someInt : Int
+    val someString: String = "someString",
+    val someInt: Int = 1
 )

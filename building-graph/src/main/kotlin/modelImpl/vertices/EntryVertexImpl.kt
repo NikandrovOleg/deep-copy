@@ -11,5 +11,5 @@ class EntryVertexImpl(
     override val original: Map.Entry<*, *>?,
     override val properties: MutableMap<String, Vertex<*, *>> = mutableMapOf(),
     override var color: Color = Color.WHITE,
-    override var copy: Map.Entry<*, *>? = null
+    override var replica: Map.Entry<*, *>? = null
 ) : EntryVertex, VertexImpl<Map.Entry<*, *>, String>()
