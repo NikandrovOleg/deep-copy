@@ -3,7 +3,7 @@ import graphParts.Graph
 import graphParts.Vertex
 
 class EstablishingConnections {
-    fun dfs(graph : Graph) {
+    fun connect(graph : Graph) {
         graph.vertices.forEach { it.color = Color.WHITE }
 
         fun dfsVisit(currentVertex: Vertex<*, *>) {
