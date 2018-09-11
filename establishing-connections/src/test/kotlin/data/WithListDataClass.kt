@@ -1,3 +1,3 @@
 package data
 
-data class WithListDataClass(val strings: List<String>)
+data class WithListDataClass(val stringList: List<String>)

@@ -61,34 +61,34 @@ class EstablishingConnectionsTest {
         val primitiveVertex1 = PrimitiveVertexImpl(String::class, "a")
         val primitiveVertex2 = PrimitiveVertexImpl(String::class, "a")
         val primitiveVertex3 = PrimitiveVertexImpl(String::class, "c")
-        withListVertex.properties["strings"] = listVertex
+        withListVertex.properties["stringList"] = listVertex
         listVertex.properties[0] = primitiveVertex0
         listVertex.properties[1] = primitiveVertex1
         listVertex.properties[2] = primitiveVertex2
         listVertex.properties[3] = primitiveVertex3
         establishingConnections.connect(GraphImpl(listOf(withListVertex, listVertex, primitiveVertex0,
             primitiveVertex1, primitiveVertex2, primitiveVertex3)))
-        assertThat(withListVertex.replica!!.strings, equalTo(list))
-        assertThat(withListVertex.replica, equalTo(WithListDataClass(mutableListOf("b", "a", "a", "c"))))
+        assertThat(withListVertex.replica!!.stringList, equalTo(list))
+        assertThat(withListVertex.replica, equalTo(WithListDataClass(listOf("b", "a", "a", "c"))))
     }
 
     @Test
     fun connectWithMutableListGraph() {
         val list = mutableListOf("b", "a", "a", "c")
-        val withListVertex = ComplexVertexImpl(WithListDataClass::class, WithListDataClass(emptyList()))
+        val withListVertex = ComplexVertexImpl(WithListDataClass::class, WithListDataClass(mutableListOf()))
         val listVertex = CollectionVertexImpl(list::class, emptyList<String>())
         val primitiveVertex0 = PrimitiveVertexImpl(String::class, "b")
         val primitiveVertex1 = PrimitiveVertexImpl(String::class, "a")
         val primitiveVertex2 = PrimitiveVertexImpl(String::class, "a")
         val primitiveVertex3 = PrimitiveVertexImpl(String::class, "c")
-        withListVertex.properties["strings"] = listVertex
+        withListVertex.properties["stringList"] = listVertex
         listVertex.properties[0] = primitiveVertex0
         listVertex.properties[1] = primitiveVertex1
         listVertex.properties[2] = primitiveVertex2
         listVertex.properties[3] = primitiveVertex3
         establishingConnections.connect(GraphImpl(listOf(withListVertex, listVertex, primitiveVertex0,
             primitiveVertex1, primitiveVertex2, primitiveVertex3)))
-        assertThat(withListVertex.replica!!.strings as MutableList<String>, equalTo(list))
+        assertThat(withListVertex.replica!!.stringList as MutableList<String>, equalTo(list))
     }
 
     @Test
@@ -105,5 +105,41 @@ class EstablishingConnectionsTest {
         establishingConnections.connect(GraphImpl(listOf(firstVertex, secondVertex, listVertex)))
         assertThat(firstVertex.replica!!.secondVertex, sameInstance(secondVertexClass))
         assertThat(secondVertex.replica!!.list[0], sameInstance(firstVertexClass))
+    }
+
+    @Test
+    fun connectWithSetGraph() {
+        val set = setOf(3, 5, 7)
+        val withSetVertex = ComplexVertexImpl(WithSetDataClass::class, WithSetDataClass(emptySet()))
+        val setVertex = CollectionVertexImpl(set::class, emptySet<Int>())
+        val primitiveVertex0 = PrimitiveVertexImpl(Int::class, 3)
+        val primitiveVertex1 = PrimitiveVertexImpl(Int::class, 5)
+        val primitiveVertex2 = PrimitiveVertexImpl(Int::class, 7)
+        withSetVertex.properties["intSet"] = setVertex
+        setVertex.properties[0] = primitiveVertex0
+        setVertex.properties[1] = primitiveVertex1
+        setVertex.properties[2] = primitiveVertex2
+        establishingConnections.connect(GraphImpl(listOf(withSetVertex, setVertex, primitiveVertex0,
+            primitiveVertex1, primitiveVertex2)))
+        assertThat(withSetVertex.replica!!.intSet, equalTo(set))
+        assertThat(withSetVertex.replica, equalTo(WithSetDataClass(setOf(3, 5, 7))))
+    }
+
+    @Test
+    fun connectWithMutableSetGraph() {
+        val set = mutableSetOf(3, 5, 7)
+        val withSetVertex = ComplexVertexImpl(WithSetDataClass::class, WithSetDataClass(mutableSetOf()))
+        val setVertex = CollectionVertexImpl(set::class, mutableSetOf<Int>())
+        val primitiveVertex0 = PrimitiveVertexImpl(Int::class, 3)
+        val primitiveVertex1 = PrimitiveVertexImpl(Int::class, 5)
+        val primitiveVertex2 = PrimitiveVertexImpl(Int::class, 7)
+        withSetVertex.properties["intSet"] = setVertex
+        setVertex.properties[0] = primitiveVertex0
+        setVertex.properties[1] = primitiveVertex1
+        setVertex.properties[2] = primitiveVertex2
+        establishingConnections.connect(GraphImpl(listOf(withSetVertex, setVertex, primitiveVertex0,
+            primitiveVertex1, primitiveVertex2)))
+        assertThat(withSetVertex.replica!!.intSet as MutableSet<Int>, equalTo(set))
+        assertThat(withSetVertex.replica, equalTo(WithSetDataClass(setOf(3, 5, 7))))
     }
 }

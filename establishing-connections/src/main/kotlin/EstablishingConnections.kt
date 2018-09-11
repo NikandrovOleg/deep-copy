@@ -20,10 +20,10 @@ class EstablishingConnections {
 
     private fun establishConnections(vertex: Vertex<Any, *>) {
         when {
-            vertex.kClass.isSubclassOf(MutableList::class) -> vertex.replica = vertex.properties.values.
-                map { it.replica }.toMutableList()
             vertex.kClass.isSubclassOf(List::class) -> vertex.replica = vertex.properties.values.
                 map { it.replica }.toList()
+            vertex.kClass.isSubclassOf(Set::class) -> vertex.replica = vertex.properties.values.
+                map { it.replica }.toSet()
             else -> vertex.properties.forEach {
                 val javaProp = vertex.kClass.java.getDeclaredField(it.key as String?)
                 javaProp.isAccessible = true
