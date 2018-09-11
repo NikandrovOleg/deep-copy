@@ -1,10 +1,11 @@
-import data.RecursiveDataClass
-import data.SimpleDataClass
+import data.*
 import model.GraphImpl
+import model.vertices.CollectionVertexImpl
 import model.vertices.ComplexVertexImpl
 import model.vertices.NullVertexImpl
 import model.vertices.PrimitiveVertexImpl
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -49,5 +50,60 @@ class EstablishingConnectionsTest {
         establishingConnections.connect(GraphImpl(listOf(vertex1, vertex2)))
         assertThat(vertex1.replica!!.obj, equalTo(obj2))
         assertThat(vertex2.replica!!.obj, equalTo(obj1))
+    }
+
+    @Test
+    fun connectWithListGraph() {
+        val list = listOf("b", "a", "a", "c")
+        val withListVertex = ComplexVertexImpl(WithListDataClass::class, WithListDataClass(emptyList()))
+        val listVertex = CollectionVertexImpl(list::class, emptyList<String>())
+        val primitiveVertex0 = PrimitiveVertexImpl(String::class, "b")
+        val primitiveVertex1 = PrimitiveVertexImpl(String::class, "a")
+        val primitiveVertex2 = PrimitiveVertexImpl(String::class, "a")
+        val primitiveVertex3 = PrimitiveVertexImpl(String::class, "c")
+        withListVertex.properties["strings"] = listVertex
+        listVertex.properties[0] = primitiveVertex0
+        listVertex.properties[1] = primitiveVertex1
+        listVertex.properties[2] = primitiveVertex2
+        listVertex.properties[3] = primitiveVertex3
+        establishingConnections.connect(GraphImpl(listOf(withListVertex, listVertex, primitiveVertex0,
+            primitiveVertex1, primitiveVertex2, primitiveVertex3)))
+        assertThat(withListVertex.replica!!.strings, equalTo(list))
+        assertThat(withListVertex.replica, equalTo(WithListDataClass(mutableListOf("b", "a", "a", "c"))))
+    }
+
+    @Test
+    fun connectWithMutableListGraph() {
+        val list = mutableListOf("b", "a", "a", "c")
+        val withListVertex = ComplexVertexImpl(WithListDataClass::class, WithListDataClass(emptyList()))
+        val listVertex = CollectionVertexImpl(list::class, emptyList<String>())
+        val primitiveVertex0 = PrimitiveVertexImpl(String::class, "b")
+        val primitiveVertex1 = PrimitiveVertexImpl(String::class, "a")
+        val primitiveVertex2 = PrimitiveVertexImpl(String::class, "a")
+        val primitiveVertex3 = PrimitiveVertexImpl(String::class, "c")
+        withListVertex.properties["strings"] = listVertex
+        listVertex.properties[0] = primitiveVertex0
+        listVertex.properties[1] = primitiveVertex1
+        listVertex.properties[2] = primitiveVertex2
+        listVertex.properties[3] = primitiveVertex3
+        establishingConnections.connect(GraphImpl(listOf(withListVertex, listVertex, primitiveVertex0,
+            primitiveVertex1, primitiveVertex2, primitiveVertex3)))
+        assertThat(withListVertex.replica!!.strings as MutableList<String>, equalTo(list))
+    }
+
+    @Test
+    fun connectCyclicGraphWithList() {
+        val secondVertexClass = SecondVertexClass()
+        val firstVertexClass = FirstVertexClass(SecondVertexClass())
+        val list = emptyList<FirstVertexClass>()
+        val firstVertex = ComplexVertexImpl(firstVertexClass::class, firstVertexClass)
+        val secondVertex = ComplexVertexImpl(secondVertexClass::class, secondVertexClass)
+        val listVertex = CollectionVertexImpl(list::class, list)
+        firstVertex.properties["secondVertex"] = secondVertex
+        secondVertex.properties["list"] = listVertex
+        listVertex.properties[0] = firstVertex
+        establishingConnections.connect(GraphImpl(listOf(firstVertex, secondVertex, listVertex)))
+        assertThat(firstVertex.replica!!.secondVertex, sameInstance(secondVertexClass))
+        assertThat(secondVertex.replica!!.list[0], sameInstance(firstVertexClass))
     }
 }
