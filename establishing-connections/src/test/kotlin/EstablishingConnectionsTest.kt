@@ -1,9 +1,6 @@
 import data.*
 import model.GraphImpl
-import model.vertices.CollectionVertexImpl
-import model.vertices.ComplexVertexImpl
-import model.vertices.NullVertexImpl
-import model.vertices.PrimitiveVertexImpl
+import model.vertices.*
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
@@ -141,5 +138,49 @@ class EstablishingConnectionsTest {
             primitiveVertex1, primitiveVertex2)))
         assertThat(withSetVertex.replica!!.intSet as MutableSet<Int>, equalTo(set))
         assertThat(withSetVertex.replica, equalTo(WithSetDataClass(setOf(3, 5, 7))))
+    }
+
+    @Test
+    fun connectWithMapGraph() {
+        val first = SimpleDataClass()
+        val second = SimpleDataClass()
+
+        val firstDataStringVertex = PrimitiveVertexImpl(String::class, "firstString")
+        val firstDataIntVertex = PrimitiveVertexImpl(Int::class, 1)
+        val secondDataStringVertex = PrimitiveVertexImpl(String::class, "secondString")
+        val secondDataIntVertex = PrimitiveVertexImpl(Int::class, 2)
+
+        val firstKeyVertex = PrimitiveVertexImpl(String::class, "firstKey")
+        val firstDataVertex = ComplexVertexImpl(first::class, first).also {
+            it.properties["someString"] = firstDataStringVertex
+            it.properties["someInt"] = firstDataIntVertex
+        }
+        val firstPairVertex = PairVertexImpl(Pair("a", SimpleDataClass())::class).also {
+            it.properties["first"] = firstKeyVertex
+            it.properties["second"] = firstDataVertex
+        }
+
+        val secondKeyVertex = PrimitiveVertexImpl(String::class, "secondKey")
+        val secondDataVertex = ComplexVertexImpl(second::class, second).also {
+            it.properties["someString"] = secondDataStringVertex
+            it.properties["someInt"] = secondDataIntVertex
+        }
+        val secondPairVertex = PairVertexImpl(Pair("a", SimpleDataClass())::class).also{
+            it.properties["first"] = secondKeyVertex
+            it.properties["second"] = secondDataVertex
+        }
+
+        val mapVertex = MapVertexImpl(emptyMap<String, SimpleDataClass>()::class).also {
+            it.properties[0] = firstPairVertex
+            it.properties[1] = secondPairVertex
+        }
+
+        val graph = GraphImpl(listOf(mapVertex, firstPairVertex, firstKeyVertex, firstDataVertex,
+            firstDataStringVertex, firstDataIntVertex, secondPairVertex, secondKeyVertex, secondDataVertex,
+            secondDataStringVertex, secondDataIntVertex))
+        establishingConnections.connect(graph)
+        assertThat(mapVertex.replica!!.size, equalTo(2))
+        assertThat(mapVertex.replica!![firstKeyVertex.replica] as SimpleDataClass, sameInstance(first))
+        assertThat(mapVertex.replica!![secondKeyVertex.replica] as SimpleDataClass, sameInstance(second))
     }
 }

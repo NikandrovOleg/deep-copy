@@ -88,10 +88,10 @@ object GraphBuilderImpl: GraphBuilder {
 
     private val vertexOfEntry = { currentObj: Any, vertices: MutableList<VertexImpl<*, *>> ->
         val currentEntry = currentObj as Map.Entry<*, *>
-        EntryVertexImpl(currentEntry::class, currentEntry).also {
+        PairVertexImpl(currentEntry.toPair()::class, currentEntry.toPair()).also {
             vertices.add(it)
-            it.properties["key"] = dfsVisit(currentEntry.key, Any::class, vertices)
-            it.properties["value"] = dfsVisit(currentEntry.value, Any::class, vertices)
+            it.properties["first"] = dfsVisit(currentEntry.key, Any::class, vertices)
+            it.properties["second"] = dfsVisit(currentEntry.value, Any::class, vertices)
         }
     }
 
