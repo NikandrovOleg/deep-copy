@@ -183,4 +183,44 @@ class EstablishingConnectionsTest {
         assertThat(mapVertex.replica!![firstKeyVertex.replica] as SimpleDataClass, sameInstance(first))
         assertThat(mapVertex.replica!![secondKeyVertex.replica] as SimpleDataClass, sameInstance(second))
     }
+
+    @Test
+    fun connectWithArrayGraph() {
+        val first = SimpleDataClass()
+        val second = SimpleDataClass()
+        val third = SimpleDataClass()
+
+        val firstStringVertex = PrimitiveVertexImpl(String::class, "a")
+        val firstIntVertex = PrimitiveVertexImpl(Int::class, 3)
+        val secondStringVertex = PrimitiveVertexImpl(String::class, "b")
+        val secondIntVertex = PrimitiveVertexImpl(Int::class, 4)
+        val thirdStringVertex = PrimitiveVertexImpl(String::class, "c")
+        val thirdIntVertex = PrimitiveVertexImpl(Int::class, 5)
+
+        val firstVertex = ComplexVertexImpl(first::class, first).also {
+            it.properties["someString"] = firstStringVertex
+            it.properties["someInt"] = firstIntVertex
+        }
+        val secondVertex = ComplexVertexImpl(second::class, second).also {
+            it.properties["someString"] = secondStringVertex
+            it.properties["someInt"] = secondIntVertex
+        }
+        val thirdVertex = ComplexVertexImpl(third::class, third).also {
+            it.properties["someString"] = thirdStringVertex
+            it.properties["someInt"] = thirdIntVertex
+        }
+        val arrayVertex = ArrayVertexImpl(Array<SimpleDataClass>::class).also {
+            it.properties[0] = firstVertex
+            it.properties[1] = secondVertex
+            it.properties[2] = thirdVertex
+        }
+
+        val graph = GraphImpl(listOf(arrayVertex, firstVertex, firstStringVertex, firstIntVertex, secondVertex,
+            secondStringVertex, secondIntVertex, thirdVertex, thirdStringVertex, thirdIntVertex))
+        establishingConnections.connect(graph)
+        assertThat(arrayVertex.replica!!.size, equalTo(3))
+        assertThat(arrayVertex.replica!![0] as SimpleDataClass, sameInstance(first))
+        assertThat(arrayVertex.replica!![1] as SimpleDataClass, sameInstance(second))
+        assertThat(arrayVertex.replica!![2] as SimpleDataClass, sameInstance(third))
+    }
 }

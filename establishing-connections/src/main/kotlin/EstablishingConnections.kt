@@ -1,6 +1,7 @@
 import graphParts.Color
 import graphParts.Graph
 import graphParts.Vertex
+import graphParts.vertices.ArrayVertex
 import graphParts.vertices.MapVertex
 import graphParts.vertices.PairVertex
 import kotlin.reflect.full.isSubclassOf
@@ -30,6 +31,8 @@ class EstablishingConnections {
                 {(it.replica as Pair<*, *>).first}, {(it.replica as Pair<*, *>).second})
             vertex is PairVertex -> vertex.replica = Pair(vertex.properties["first"]!!.replica,
                 vertex.properties["second"]!!.replica)
+            vertex is ArrayVertex -> vertex.replica = vertex.properties.toSortedMap().values.map { it.replica }.
+                toTypedArray()
             else -> vertex.properties.forEach {
                 val javaProp = vertex.kClass.java.getDeclaredField(it.key as String?)
                 javaProp.isAccessible = true
