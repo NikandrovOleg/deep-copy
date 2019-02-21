@@ -2,7 +2,6 @@ package model.vertices
 
 import graphParts.Color
 import graphParts.Vertex
-import graphParts.vertices.PairVertex
 import kotlin.reflect.KClass
 
 data class PairVertexImpl(

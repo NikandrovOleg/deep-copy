@@ -1,4 +1,3 @@
-import graphParts.vertices.ComplexVertex
 import model.GraphImpl
 import model.vertices.ComplexVertexImpl
 import model.vertices.NullVertexImpl
@@ -6,8 +5,6 @@ import model.vertices.PrimitiveVertexImpl
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import kotlin.reflect.full.functions
-import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.isSubclassOf
 
 class FillingCopiesTest {

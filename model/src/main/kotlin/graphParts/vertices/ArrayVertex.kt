@@ -1,5 +1,7 @@
 package graphParts.vertices
 
-import graphParts.Vertex
-
-interface ArrayVertex: Vertex<Array<*>, Int>
+interface ArrayVertex : LazyInitVertex<Array<*>, Int> {
+    override fun initReplica() {
+        replica = properties.toSortedMap().values.map { it.replica }.toTypedArray()
+    }
+}

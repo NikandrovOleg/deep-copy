@@ -1,11 +1,11 @@
 package modelImpl.vertices
 
+import graphParts.vertices.InstantInitVertex
 import graphParts.Color
 import graphParts.Vertex
-import graphParts.vertices.PairVertex
 
-class PairVertexImpl(
-    override var replica: Pair<*, *>? = null,
+data class InstantInitVertexImpl<T : Any>(
+    override var replica: T?,
     override var color: Color = Color.WHITE,
     override val properties: MutableMap<String, Vertex<*, *>> = mutableMapOf()
-) : PairVertex
+) : InstantInitVertex<T>

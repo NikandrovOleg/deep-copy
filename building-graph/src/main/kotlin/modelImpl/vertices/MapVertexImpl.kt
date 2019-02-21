@@ -1,15 +1,11 @@
 package modelImpl.vertices
 
+import graphParts.vertices.MapVertex
 import graphParts.Color
 import graphParts.Vertex
-import graphParts.vertices.MapVertex
-import modelImpl.VertexImpl
-import kotlin.reflect.KClass
 
-class MapVertexImpl(
-    override val kClass: KClass<out Map<*, *>>,
-    override val original: Map<*, *>?,
-    override var color: Color = Color.WHITE,
+data class MapVertexImpl(
     override var replica: Map<*, *>? = null,
+    override var color: Color = Color.WHITE,
     override val properties: MutableMap<Int, Vertex<*, *>> = mutableMapOf()
-) : MapVertex, VertexImpl<Map<*, *>, Int>()
+) : MapVertex

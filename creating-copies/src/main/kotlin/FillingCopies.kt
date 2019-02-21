@@ -1,6 +1,4 @@
 import graphParts.Graph
-import graphParts.vertices.ComplexVertex
-import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.isSubclassOf
 
 class FillingCopies {

@@ -2,7 +2,6 @@ package model.vertices
 
 import graphParts.Color
 import graphParts.Vertex
-import graphParts.vertices.CollectionVertex
 import kotlin.reflect.KClass
 
 class CollectionVertexImpl(

@@ -1,11 +1,11 @@
 package modelImpl.vertices
 
-import graphParts.vertices.ArrayVertex
+import graphParts.vertices.ListVertex
 import graphParts.Color
 import graphParts.Vertex
 
-data class ArrayVertexImpl(
-    override var replica: Array<*>? = null,
+data class ListVertexImpl(
+    override var replica: List<*>? = null,
     override var color: Color = Color.WHITE,
     override val properties: MutableMap<Int, Vertex<*, *>> = mutableMapOf()
-) : ArrayVertex
+) : ListVertex

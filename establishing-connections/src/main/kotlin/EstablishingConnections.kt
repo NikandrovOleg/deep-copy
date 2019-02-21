@@ -3,8 +3,6 @@ import graphParts.Graph
 import graphParts.Vertex
 import graphParts.vertices.ArrayVertex
 import graphParts.vertices.MapVertex
-import graphParts.vertices.PairVertex
-import kotlin.reflect.full.isSubclassOf
 
 class EstablishingConnections {
     fun connect(graph : Graph) {
