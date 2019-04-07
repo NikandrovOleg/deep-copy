@@ -2,11 +2,10 @@ package model.vertices
 
 import graphParts.Color
 import graphParts.Vertex
-import kotlin.reflect.KClass
+import graphParts.vertices.PairVertex
 
-data class PairVertexImpl(
-    override val kClass: KClass<out Pair<*, *>>,
-    override var color: Color = Color.WHITE,
+class PairVertexImpl(
     override var replica: Pair<*, *>? = null,
+    override var color: Color = Color.WHITE,
     override val properties: MutableMap<String, Vertex<*, *>> = mutableMapOf()
 ) : PairVertex

@@ -2,11 +2,10 @@ package model.vertices
 
 import graphParts.Color
 import graphParts.Vertex
-import kotlin.reflect.KClass
+import graphParts.vertices.InstantInitVertex
 
-data class ComplexVertexImpl<T: Any>(
-    override val kClass: KClass<out T>,
-    override var replica: T? = null,
+data class InstantInitVertexImpl<T : Any>(
+    override var replica: T?,
     override var color: Color = Color.WHITE,
     override val properties: MutableMap<String, Vertex<*, *>> = mutableMapOf()
-) : ComplexVertex<T>
+) : InstantInitVertex<T>

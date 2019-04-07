@@ -11,26 +11,26 @@ class EstablishingConnectionsTest {
 
     @Test
     fun connectNullVertexGraph() {
-        val graph = GraphImpl(listOf(NullVertexImpl(String::class)))
+        val graph = GraphImpl(listOf(ObsoleteInitVertexImpl<String>()))
         establishingConnections.connect(graph)
     }
 
     @Test
     fun connectSimpleDataClassGraph() {
-        val simpleDataVertex = ComplexVertexImpl(SimpleDataClass::class, SimpleDataClass("a", 1))
-        val stringVertex = PrimitiveVertexImpl(String::class, "str")
-        val intVertex = PrimitiveVertexImpl(Int::class, 1)
+        val simpleDataVertex = InstantInitVertexImpl(SimpleDataClass("a", 1))
+        val stringVertex = ObsoleteInitVertexImpl("str")
+        val intVertex = ObsoleteInitVertexImpl(2)
         simpleDataVertex.properties["someString"] = stringVertex
         simpleDataVertex.properties["someInt"] = intVertex
         val graph = GraphImpl(listOf(simpleDataVertex, stringVertex, intVertex))
         establishingConnections.connect(graph)
-        assertThat(simpleDataVertex.replica!!.someInt, equalTo(1))
+        assertThat(simpleDataVertex.replica!!.someInt, equalTo(2))
         assertThat(simpleDataVertex.replica!!.someString, equalTo("str"))
     }
 
     @Test
     fun connectRecursiveDataClassGraph() {
-        val vertex = ComplexVertexImpl(RecursiveDataClass::class, RecursiveDataClass())
+        val vertex = InstantInitVertexImpl(RecursiveDataClass())
         vertex.properties["obj"] = vertex
         establishingConnections.connect(GraphImpl(listOf(vertex)))
         assertThat(vertex.replica!!.obj, equalTo(vertex.replica))
@@ -40,8 +40,8 @@ class EstablishingConnectionsTest {
     fun connectCyclicGraph() {
         val obj1 = RecursiveDataClass()
         val obj2 = RecursiveDataClass()
-        val vertex1 = ComplexVertexImpl(RecursiveDataClass::class, obj1)
-        val vertex2 = ComplexVertexImpl(RecursiveDataClass::class, obj2)
+        val vertex1 = InstantInitVertexImpl(obj1)
+        val vertex2 = InstantInitVertexImpl(obj2)
         vertex1.properties["obj"] = vertex2
         vertex2.properties["obj"] = vertex1
         establishingConnections.connect(GraphImpl(listOf(vertex1, vertex2)))
@@ -52,12 +52,12 @@ class EstablishingConnectionsTest {
     @Test
     fun connectWithListGraph() {
         val list = listOf("b", "a", "a", "c")
-        val withListVertex = ComplexVertexImpl(WithListDataClass::class, WithListDataClass(emptyList()))
-        val listVertex = CollectionVertexImpl(list::class, emptyList<String>())
-        val primitiveVertex0 = PrimitiveVertexImpl(String::class, "b")
-        val primitiveVertex1 = PrimitiveVertexImpl(String::class, "a")
-        val primitiveVertex2 = PrimitiveVertexImpl(String::class, "a")
-        val primitiveVertex3 = PrimitiveVertexImpl(String::class, "c")
+        val withListVertex = InstantInitVertexImpl(WithListDataClass(emptyList()))
+        val listVertex = ListVertexImpl()
+        val primitiveVertex0 = ObsoleteInitVertexImpl("b")
+        val primitiveVertex1 = ObsoleteInitVertexImpl("a")
+        val primitiveVertex2 = ObsoleteInitVertexImpl("a")
+        val primitiveVertex3 = ObsoleteInitVertexImpl("c")
         withListVertex.properties["stringList"] = listVertex
         listVertex.properties[0] = primitiveVertex0
         listVertex.properties[1] = primitiveVertex1
@@ -72,12 +72,12 @@ class EstablishingConnectionsTest {
     @Test
     fun connectWithMutableListGraph() {
         val list = mutableListOf("b", "a", "a", "c")
-        val withListVertex = ComplexVertexImpl(WithListDataClass::class, WithListDataClass(mutableListOf()))
-        val listVertex = CollectionVertexImpl(list::class, emptyList<String>())
-        val primitiveVertex0 = PrimitiveVertexImpl(String::class, "b")
-        val primitiveVertex1 = PrimitiveVertexImpl(String::class, "a")
-        val primitiveVertex2 = PrimitiveVertexImpl(String::class, "a")
-        val primitiveVertex3 = PrimitiveVertexImpl(String::class, "c")
+        val withListVertex = InstantInitVertexImpl(WithListDataClass(mutableListOf()))
+        val listVertex = ListVertexImpl(emptyList<String>())
+        val primitiveVertex0 = ObsoleteInitVertexImpl("b")
+        val primitiveVertex1 = ObsoleteInitVertexImpl("a")
+        val primitiveVertex2 = ObsoleteInitVertexImpl("a")
+        val primitiveVertex3 = ObsoleteInitVertexImpl("c")
         withListVertex.properties["stringList"] = listVertex
         listVertex.properties[0] = primitiveVertex0
         listVertex.properties[1] = primitiveVertex1
@@ -93,9 +93,9 @@ class EstablishingConnectionsTest {
         val secondVertexClass = SecondVertexClass()
         val firstVertexClass = FirstVertexClass(SecondVertexClass())
         val list = emptyList<FirstVertexClass>()
-        val firstVertex = ComplexVertexImpl(firstVertexClass::class, firstVertexClass)
-        val secondVertex = ComplexVertexImpl(secondVertexClass::class, secondVertexClass)
-        val listVertex = CollectionVertexImpl(list::class, list)
+        val firstVertex = InstantInitVertexImpl(firstVertexClass)
+        val secondVertex = InstantInitVertexImpl(secondVertexClass)
+        val listVertex = ListVertexImpl(list)
         firstVertex.properties["secondVertex"] = secondVertex
         secondVertex.properties["list"] = listVertex
         listVertex.properties[0] = firstVertex
@@ -107,11 +107,11 @@ class EstablishingConnectionsTest {
     @Test
     fun connectWithSetGraph() {
         val set = setOf(3, 5, 7)
-        val withSetVertex = ComplexVertexImpl(WithSetDataClass::class, WithSetDataClass(emptySet()))
-        val setVertex = CollectionVertexImpl(set::class, emptySet<Int>())
-        val primitiveVertex0 = PrimitiveVertexImpl(Int::class, 3)
-        val primitiveVertex1 = PrimitiveVertexImpl(Int::class, 5)
-        val primitiveVertex2 = PrimitiveVertexImpl(Int::class, 7)
+        val withSetVertex = InstantInitVertexImpl(WithSetDataClass(emptySet()))
+        val setVertex = SetVertexImpl(emptySet<Int>())
+        val primitiveVertex0 = ObsoleteInitVertexImpl(3)
+        val primitiveVertex1 = ObsoleteInitVertexImpl(5)
+        val primitiveVertex2 = ObsoleteInitVertexImpl(7)
         withSetVertex.properties["intSet"] = setVertex
         setVertex.properties[0] = primitiveVertex0
         setVertex.properties[1] = primitiveVertex1
@@ -125,11 +125,11 @@ class EstablishingConnectionsTest {
     @Test
     fun connectWithMutableSetGraph() {
         val set = mutableSetOf(3, 5, 7)
-        val withSetVertex = ComplexVertexImpl(WithSetDataClass::class, WithSetDataClass(mutableSetOf()))
-        val setVertex = CollectionVertexImpl(set::class, mutableSetOf<Int>())
-        val primitiveVertex0 = PrimitiveVertexImpl(Int::class, 3)
-        val primitiveVertex1 = PrimitiveVertexImpl(Int::class, 5)
-        val primitiveVertex2 = PrimitiveVertexImpl(Int::class, 7)
+        val withSetVertex = InstantInitVertexImpl(WithSetDataClass(mutableSetOf()))
+        val setVertex = SetVertexImpl(mutableSetOf<Int>())
+        val primitiveVertex0 = ObsoleteInitVertexImpl(3)
+        val primitiveVertex1 = ObsoleteInitVertexImpl(5)
+        val primitiveVertex2 = ObsoleteInitVertexImpl(7)
         withSetVertex.properties["intSet"] = setVertex
         setVertex.properties[0] = primitiveVertex0
         setVertex.properties[1] = primitiveVertex1
@@ -145,32 +145,32 @@ class EstablishingConnectionsTest {
         val first = SimpleDataClass()
         val second = SimpleDataClass()
 
-        val firstDataStringVertex = PrimitiveVertexImpl(String::class, "firstString")
-        val firstDataIntVertex = PrimitiveVertexImpl(Int::class, 1)
-        val secondDataStringVertex = PrimitiveVertexImpl(String::class, "secondString")
-        val secondDataIntVertex = PrimitiveVertexImpl(Int::class, 2)
+        val firstDataStringVertex = ObsoleteInitVertexImpl("firstString")
+        val firstDataIntVertex = ObsoleteInitVertexImpl(1)
+        val secondDataStringVertex = ObsoleteInitVertexImpl("secondString")
+        val secondDataIntVertex = ObsoleteInitVertexImpl(2)
 
-        val firstKeyVertex = PrimitiveVertexImpl(String::class, "firstKey")
-        val firstDataVertex = ComplexVertexImpl(first::class, first).also {
+        val firstKeyVertex = ObsoleteInitVertexImpl("firstKey")
+        val firstDataVertex = InstantInitVertexImpl(first).also {
             it.properties["someString"] = firstDataStringVertex
             it.properties["someInt"] = firstDataIntVertex
         }
-        val firstPairVertex = PairVertexImpl(Pair("a", SimpleDataClass())::class).also {
+        val firstPairVertex = PairVertexImpl(Pair("a", SimpleDataClass())).also {
             it.properties["first"] = firstKeyVertex
             it.properties["second"] = firstDataVertex
         }
 
-        val secondKeyVertex = PrimitiveVertexImpl(String::class, "secondKey")
-        val secondDataVertex = ComplexVertexImpl(second::class, second).also {
+        val secondKeyVertex = ObsoleteInitVertexImpl("secondKey")
+        val secondDataVertex = InstantInitVertexImpl(second).also {
             it.properties["someString"] = secondDataStringVertex
             it.properties["someInt"] = secondDataIntVertex
         }
-        val secondPairVertex = PairVertexImpl(Pair("a", SimpleDataClass())::class).also{
+        val secondPairVertex = PairVertexImpl(Pair("a", SimpleDataClass())).also{
             it.properties["first"] = secondKeyVertex
             it.properties["second"] = secondDataVertex
         }
 
-        val mapVertex = MapVertexImpl(emptyMap<String, SimpleDataClass>()::class).also {
+        val mapVertex = MapVertexImpl(emptyMap<String, SimpleDataClass>()).also {
             it.properties[0] = firstPairVertex
             it.properties[1] = secondPairVertex
         }
@@ -190,26 +190,26 @@ class EstablishingConnectionsTest {
         val second = SimpleDataClass()
         val third = SimpleDataClass()
 
-        val firstStringVertex = PrimitiveVertexImpl(String::class, "a")
-        val firstIntVertex = PrimitiveVertexImpl(Int::class, 3)
-        val secondStringVertex = PrimitiveVertexImpl(String::class, "b")
-        val secondIntVertex = PrimitiveVertexImpl(Int::class, 4)
-        val thirdStringVertex = PrimitiveVertexImpl(String::class, "c")
-        val thirdIntVertex = PrimitiveVertexImpl(Int::class, 5)
+        val firstStringVertex = ObsoleteInitVertexImpl("a")
+        val firstIntVertex = ObsoleteInitVertexImpl(3)
+        val secondStringVertex = ObsoleteInitVertexImpl("b")
+        val secondIntVertex = ObsoleteInitVertexImpl(4)
+        val thirdStringVertex = ObsoleteInitVertexImpl("c")
+        val thirdIntVertex = ObsoleteInitVertexImpl(5)
 
-        val firstVertex = ComplexVertexImpl(first::class, first).also {
+        val firstVertex = InstantInitVertexImpl(first).also {
             it.properties["someString"] = firstStringVertex
             it.properties["someInt"] = firstIntVertex
         }
-        val secondVertex = ComplexVertexImpl(second::class, second).also {
+        val secondVertex = InstantInitVertexImpl(second).also {
             it.properties["someString"] = secondStringVertex
             it.properties["someInt"] = secondIntVertex
         }
-        val thirdVertex = ComplexVertexImpl(third::class, third).also {
+        val thirdVertex = InstantInitVertexImpl(third).also {
             it.properties["someString"] = thirdStringVertex
             it.properties["someInt"] = thirdIntVertex
         }
-        val arrayVertex = ArrayVertexImpl(Array<SimpleDataClass>::class).also {
+        val arrayVertex = ArrayVertexImpl().also {
             it.properties[0] = firstVertex
             it.properties[1] = secondVertex
             it.properties[2] = thirdVertex

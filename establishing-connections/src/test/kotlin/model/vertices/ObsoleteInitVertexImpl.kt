@@ -2,11 +2,12 @@ package model.vertices
 
 import graphParts.Color
 import graphParts.Vertex
-import kotlin.reflect.KClass
+import graphParts.vertices.ObsoleteInitVertex
 
-data class PrimitiveVertexImpl<T: Any>(
-    override val kClass: KClass<out T>,
-    override var replica: T?,
+data class ObsoleteInitVertexImpl<T: Any>(
+    override var replica: T? = null,
     override var color: Color = Color.WHITE,
     override val properties: MutableMap<Any, Vertex<*, *>> = mutableMapOf()
-) : PrimitiveVertex<T>
+) : ObsoleteInitVertex<T> {
+    override fun initReplica() {}
+}
