@@ -1,7 +1,7 @@
 package graphParts.vertices
 
-interface SetVertex: LazyInitVertex<Set<*>, Int> {
+interface SetVertex<K: Any?>: LazyInitVertex<Set<K>, Int> {
     override fun initReplica() {
-        replica = properties.values.map { it.replica }.toSet()
+        replica = properties.values.map { it.replica }.toSet() as Set<K>
     }
 }

@@ -1,7 +1,7 @@
 package graphParts.vertices
 
-interface ListVertex : LazyInitVertex<List<*>, Int> {
+interface ListVertex<K: Any?> : LazyInitVertex<List<K>, Int> {
     override fun initReplica() {
-        replica = properties.values.map { it.replica }.toList()
+        replica = properties.values.map { it.replica }.toList() as List<K>
     }
 }

@@ -8,34 +8,34 @@ class VertexWithOriginal<T : Any, V : Any>(val vertex: Vertex<T, V>, val origina
     fun fillProperties(func: (Any?) -> VertexWithOriginal<*, *>) {
         when {
             (vertex is InstantInitVertex<T>) -> {
-                for (prop in original!!::class.memberProperties) {
+                original!!::class.memberProperties.forEach { prop ->
                     vertex.properties[prop.name] = func(original.javaClass.getDeclaredField(prop.name).also {
                         it.isAccessible = true
                     }.get(original))
                 }
             }
-            (vertex is ArrayVertex) -> {
+            (vertex is ArrayVertex<*>) -> {
                 for (i in (original as Array<*>).indices) {
                     vertex.properties[i] = func(original[i])
                 }
             }
-            (vertex is ListVertex) -> {
-                for (i in (original as List<*>).indices) {
+            (vertex is ListVertex<*>) -> {
+                (original as List<*>).indices.forEach { i ->
                     vertex.properties[i] = func(original[i])
                 }
             }
-            (vertex is SetVertex) -> {
-                for (i in (original as Set<*>).indices) {
+            (vertex is SetVertex<*>) -> {
+                (original as Set<*>).indices.forEach { i ->
                     vertex.properties[i] = func(original.elementAt(i))
                 }
             }
-            (vertex is MapVertex) -> {
+            (vertex is MapVertex<*, *>) -> {
                 val pairList = (original as Map<*, *>).toList()
-                for (i in pairList.indices) {
+                pairList.indices.forEach { i ->
                     vertex.properties[i] = func(pairList[i])
                 }
             }
-            (vertex is PairVertex) -> {
+            (vertex is PairVertex<*, *>) -> {
                 vertex.properties["first"] = func((original as Pair<*, *>).first)
                 vertex.properties["second"] = func((original as Pair<*, *>).second)
             }

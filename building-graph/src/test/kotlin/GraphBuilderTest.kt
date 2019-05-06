@@ -14,13 +14,13 @@ import kotlin.reflect.full.isSubclassOf
 class GraphBuilderTest {
 
     @Test
-    fun returnGraphOfObject() {
+    fun testGraphOfObject() {
         val graphBuilder = GraphBuilder()
         assertThat(graphBuilder.buildGraph(Any()), instanceOf(Graph::class.java))
     }
 
     @Test
-    fun returnGraphOfOneString() {
+    fun testGraphOfOneString() {
         val graphBuilder = GraphBuilder()
         val str = "testString"
         val graph = graphBuilder.buildGraph(str)
@@ -29,7 +29,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfPrimitiveDataClass() {
+    fun testGraphOfPrimitiveDataClass() {
         val graph = GraphBuilder().buildGraph(PrimitiveDataClass("str1", "str2"))
         assertThat(graph.vertices.size, `is`(3))
         assertThat(
@@ -48,7 +48,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfPrimitiveDataWithManyFieldsClass() {
+    fun testGraphOfPrimitiveDataWithManyFieldsClass() {
         val graph = GraphBuilder().buildGraph(PrimitiveDataWithManyFieldsClass())
         assertThat(graph.vertices.size, `is`(10))
         assertThat(
@@ -76,7 +76,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfPrimitiveDataClassWithNullField() {
+    fun testGraphOfPrimitiveDataClassWithNullField() {
         val graph = GraphBuilder().buildGraph(PrimitiveDataClass(null, null))
         assertThat(graph.vertices.size, `is`(2))
         assertThat(
@@ -87,7 +87,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfComplexDataClassWithNullField() {
+    fun testGraphOfComplexDataClassWithNullField() {
         val graph = GraphBuilder().buildGraph(ComplexDataClass(ComplexDataClass()))
         assertThat(graph.vertices.size, `is`(8))
         assertThat(
@@ -107,7 +107,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfRecursiveObject() {
+    fun testGraphOfRecursiveObject() {
         val obj = RecursiveDataClass()
         obj.obj = obj
         val graph = GraphBuilder().buildGraph(obj)
@@ -119,7 +119,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnCyclicGraph() {
+    fun testCyclicGraph() {
         val obj1 = RecursiveDataClass()
         val obj2 = RecursiveDataClass(obj1)
         val obj3 = RecursiveDataClass(obj2)
@@ -130,7 +130,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfArrayOfString() {
+    fun testArrayOfString() {
         val graph = GraphBuilder().buildGraph(arrayOf("string1", "string2", "string3", "string1"))
         assertThat(graph.vertices.size, `is`(4))
         assertThat(
@@ -145,7 +145,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfArrayOfNullableChars() {
+    fun testArrayOfNullableChars() {
         val graph = GraphBuilder().buildGraph(arrayOf('a', null, null, null, 'e'))
         assertThat(graph.vertices.size, `is`(4))
         assertThat(
@@ -164,7 +164,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfListOfInts() {
+    fun testListOfInts() {
         val graph = GraphBuilder().buildGraph(listOf(1, 2, 1, 2, 1, 2))
         assertThat(graph.vertices.size, `is`(3))
         assertThat(
@@ -179,7 +179,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfListOfNullableDouble() {
+    fun testListOfNullableDouble() {
         val graph = GraphBuilder().buildGraph(listOf(3.14, 5.67, null, null, 9.73))
         assertThat(graph.vertices.size, `is`(5))
         assertThat(graph.vertices.count {
@@ -200,7 +200,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfSetOfFloats() {
+    fun testSetOfFloats() {
         val graph = GraphBuilder().buildGraph(setOf(7.87F, 9.32F, -8.41F))
         assertThat(graph.vertices.size, `is`(4))
         assertThat(
@@ -215,7 +215,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfSetOfNullableLongs() {
+    fun testSetOfNullableLongs() {
         val graph = GraphBuilder().buildGraph(setOf(4L, 893745L, null, 2L))
         assertThat(graph.vertices.size, `is`(5))
         assertThat(graph.vertices.count {
@@ -236,7 +236,7 @@ class GraphBuilderTest {
     }
 
     @Test
-    fun returnGraphOfMap() {
+    fun testMap() {
         val graph = GraphBuilder().buildGraph(mapOf("a" to 1, "b" to 2, "c" to 3))
         assertThat(graph.vertices.size, `is`(10))
         assertThat(

@@ -3,11 +3,13 @@ package modelImpl
 import graphParts.Graph
 import graphParts.Vertex
 
-class GraphImpl private constructor(override val vertices: List<Vertex<*, *>>) : Graph {
+class GraphImpl<T: Any> private constructor(override val vertices: List<Vertex<*, *>>, val root: Vertex<T, *>)
+    : Graph<T> {
+    override fun getRootReplica(): T? = root.replica
 
     companion object {
-        fun of(vertices: List<Vertex<*, *>>): GraphImpl {
-            return GraphImpl(vertices)
+        fun <T: Any> of(vertices: List<Vertex<*, *>>, root: Vertex<T, *>): GraphImpl<T> {
+            return GraphImpl(vertices, root)
         }
     }
 }

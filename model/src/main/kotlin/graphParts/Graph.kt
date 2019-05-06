@@ -1,5 +1,6 @@
 package graphParts
 
-interface Graph {
+interface Graph<T: Any> {
     val vertices: List<Vertex<*, *>>
+    fun getRootReplica(): T?
 }
