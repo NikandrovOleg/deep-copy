@@ -30,10 +30,8 @@ project(":establishing-connections") {
     }
 }
 
-project(":facade") {
-    dependencies {
-        implementation(project(":model"))
-        implementation(project(":building-graph"))
-        implementation(project(":establishing-connections"))
-    }
+dependencies {
+    implementation(project(":model"))
+    implementation(project(":building-graph"))
+    implementation(project(":establishing-connections"))
 }

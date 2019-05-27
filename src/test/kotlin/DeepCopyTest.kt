@@ -1,5 +1,6 @@
 
 import data.ComplexDataClass
+import data.NoDefaultConstructor
 import data.RecursiveDataClass
 import data.SimpleDataClass
 import org.hamcrest.CoreMatchers.*
@@ -111,5 +112,11 @@ class DeepCopyTest {
             assertThat(map[it], equalTo(replica[it]))
         }
         assertThat(map, equalTo(replica))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun getException() {
+        val obj = NoDefaultConstructor(42)
+        val replica = deepCopy.getCopy(obj)
     }
 }
