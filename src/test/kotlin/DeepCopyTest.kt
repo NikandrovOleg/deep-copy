@@ -1,8 +1,5 @@
 
-import data.ComplexDataClass
-import data.NoDefaultConstructor
-import data.RecursiveDataClass
-import data.SimpleDataClass
+import data.*
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -115,7 +112,7 @@ class DeepCopyTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun getException() {
+    fun testNoDefaultConstructorClass() {
         val obj = NoDefaultConstructor(42)
         val replica = deepCopy.getCopy(obj)
     }
